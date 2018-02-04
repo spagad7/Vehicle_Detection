@@ -2,6 +2,7 @@ import os
 import argparse
 import cv2
 import glob
+import pickle
 import numpy as np
 import matplotlib.image as mpimg
 from sklearn.svm import LinearSVC
@@ -20,9 +21,9 @@ def train():
     img_vehicles = getImageList(args.dataset_path+"/vehicles")
     img_non_vehicles = getImageList(args.dataset_path+"/non-vehicles")
 
-    settings = {'cspace':'RGB',
+    settings = {'cspace':'YCrCb',
                 'spatial':True,
-                'img_size':(32, 32),
+                'sp_img_size':(32, 32),
                 'hist':True,
                 'nbins':32,
                 'bins_range':(0, 256),
@@ -74,6 +75,27 @@ def train():
     svc = LinearSVC()
     svc.fit(x_train, y_train)
     print("Score = ", svc.score(x_test, y_test))
+    # Save trained model
+    save_dict = {'cspace':'YCrCb',
+                'spatial':True,
+                'sp_img_size':(32, 32),
+                'hist':True,
+                'nbins':32,
+                'bins_range':(0, 256),
+                'hog':True,
+                'orientations':9,
+                'pixels_per_cell':8,
+                'cells_per_block':2,
+                'block_norm':'L2-Hys',
+                'visualize':False,
+                'transform_sqrt':True,
+                'feature_vector':True,
+                'scaler':scaler,
+                'svc':svc}
+    f = open("models/model_svc.p", "wb")
+    pickle.dump(save_dict, f)
+    print("Saved model in models/model_svc.p")
+
 
 
 # Function to get image names from dataset

@@ -49,7 +49,7 @@ def getHogFeat(img, orient=9, px=(8, 8), cell_blk=(2, 2), norm=True,
 def getFeatures(img, settings):
     # Ghange color space
     if(settings['cspace'] != 'RGB'):
-        cspace = getattr(cv2, "COLOR_RGB2"+settings['cpsace'])
+        cspace = getattr(cv2, "COLOR_RGB2"+settings['cspace'])
         img_cspace = cv2.cvtColor(img, cspace)
     else:
         img_cspace = img
@@ -57,7 +57,7 @@ def getFeatures(img, settings):
     # Extract features
     features = []
     if(settings['spatial'] == True):
-        features.append(getSpatialFeat(img_cspace, size=settings['img_size']))
+        features.append(getSpatialFeat(img_cspace, size=settings['sp_img_size']))
     if(settings['hist'] == True):
         features.append(getHistFeat(img_cspace, nbins=settings['nbins'],
                                     bins_range=settings['bins_range']))
