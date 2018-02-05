@@ -82,7 +82,7 @@ def pipeline():
     win_history = deque()
     history_ct = 10
     for frame in video.iter_frames():
-        # List to store detected windows
+        # List to store detected window
         windows = []
 
         win1 = d.detect(frame, scale=1, y_start=400, y_stop=464)
