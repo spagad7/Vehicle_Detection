@@ -26,7 +26,6 @@ class Detector:
 
     # Function to detect vehicles in image
     def detect(self, img, scale=1.0, y_start=0, y_stop=1280):
-        img_out = np.copy(img)
         # Convert colorspace of image
         if self.cspace != 'RGB':
             color = getattr(cv2, 'COLOR_RGB2' + self.cspace)
@@ -71,8 +70,8 @@ class Detector:
         # List for storing detected windows
         windows = []
         # Slide windows, extracting HOG, spatial and color histogram features
-        for x in range(nx_win):
-            for y in range(ny_win):
+        for y in range(ny_win):
+            for x in range(nx_win):
                 x_pos = x * cell_step
                 y_pos = y * cell_step
                 features_win = []

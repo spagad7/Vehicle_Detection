@@ -22,15 +22,15 @@ def train():
     img_vehicles = get_image_list(args.dataset_path + "/vehicles")
     img_non_vehicles = get_image_list(args.dataset_path + "/non-vehicles")
 
-    settings = {'cspace': 'YCrCb',
-                'spatial': True,
+    settings = {'cspace': 'HSV',
+                'spatial': False,
                 'sp_img_size': (16, 16),
-                'hist': True,
+                'hist': False,
                 'nbins': 32,
                 'bins_range': (0, 256),
                 'hog': True,
                 'orientations': 8,
-                'pixels_per_cell': 8,
+                'pixels_per_cell': 16,
                 'cells_per_block': 2,
                 'block_norm': 'L2-Hys',
                 'visualize': False,

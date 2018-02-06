@@ -23,7 +23,7 @@ def get_hist_feat(img, nbins=32, bins_range=(0, 256)):
 
 
 # Function to get hog features
-def get_hog_feat(img, orient=9, px=(8, 8), cell_blk=(2, 2), norm=True,
+def get_hog_feat(img, orient=9, px=8, cell_blk=2, norm=True,
                vis=False, transform=True, feat_vec=True):
     if vis:
         features, img_hog = hog(img, orientations=orient,

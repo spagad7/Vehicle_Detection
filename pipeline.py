@@ -7,6 +7,7 @@ from collections import deque
 from moviepy.editor import VideoFileClip
 from scipy.ndimage.measurements import label
 from detect import *
+import matplotlib.pyplot as plt
 
 
 def draw_labeled_bboxes(img, labels):
@@ -27,25 +28,20 @@ def draw_labeled_bboxes(img, labels):
 
 def get_labels(img, windows):
     img_out = np.copy(img)
-    img_heat = np.zeros_like(img_out)
+    img_heat = np.zeros_like(img_out[:,:,0])
     # Generate heat image
     for window in windows:
         top = window[0][1]
         bottom = window[1][1]
         left = window[0][0]
         right = window[1][0]
-        img_heat[top:bottom, left:right, 2] += 1
+        img_heat[top:bottom, left:right] += 1
+
     # Threshold heat image
-    thresh = 30
-    img_heat[img_heat[:, :, 2] <= thresh] = 0
+    thresh = 15
+    img_heat[img_heat <= thresh] = 0
     labels = label(img_heat)
-    # print("Num Vehicles = ", labels[1])
-    # img_out = np.uint8((255 * labels[0])//np.max(labels[0]))
-    # img_bin = np.zeros((img.shape[0], img.shape[1]))
-    # img_bin[img_heat[:,:,0] >= thresh] = 255
-    # cv2.rectangle(img_out,
-    #              tuple(window[0]), tuple(window[1]),
-    #              (0, 0, 255), 3)
+
     return labels
 
 
@@ -58,20 +54,12 @@ def pipeline():
     args = parser.parse_args()
 
     # Load trained model from pickled file
-    f = open("models/model_svc_yuv.p", "rb")
+    f = open("models/model_svc_hsv.p", "rb")
     settings = pickle.load(f)
     f.close()
 
     # Create detect class instance
     d = Detector(settings)
-
-    '''
-    img = mpimg.imread(args.v)
-    img_detect = d.detect(img, scale=1, y_start=400, y_stop=656)
-    img_out = cv2.cvtColor(img_detect, cv2.COLOR_RGB2BGR)
-    cv2.imshow("Output", img_out)
-    cv2.waitKey(0)
-    '''
 
     # Process frames
     video = VideoFileClip(args.v)
@@ -81,41 +69,26 @@ def pipeline():
     # List to maintain window history
     win_history = deque()
     history_ct = 10
+    i = 0
     for frame in video.iter_frames():
         # List to store detected window
         windows = []
 
-        win1 = d.detect(frame, scale=1, y_start=400, y_stop=464)
+        win1 = d.detect(frame, scale=1, y_start=400, y_stop=496)
         if len(win1) != 0:
             windows.append(win1)
 
-        win2 = d.detect(frame, scale=1, y_start=416, y_stop=480)
+        win2 = d.detect(frame, scale=1.5, y_start=400, y_stop=544)
         if len(win2) != 0:
             windows.append(win2)
 
-        win3 = d.detect(frame, scale=1.5, y_start=400, y_stop=496)
+        win3 = d.detect(frame, scale=2, y_start=400, y_stop=592)
         if len(win3) != 0:
             windows.append(win3)
 
-        win4 = d.detect(frame, scale=1.5, y_start=432, y_stop=528)
+        win4 = d.detect(frame, scale=3.5, y_start=400, y_stop=656)
         if len(win4) != 0:
             windows.append(win4)
-
-        win5 = d.detect(frame, scale=2, y_start=400, y_stop=528)
-        if len(win5) != 0:
-            windows.append(win5)
-
-        win6 = d.detect(frame, scale=2, y_start=432, y_stop=560)
-        if len(win6) != 0:
-            windows.append(win6)
-
-        win7 = d.detect(frame, scale=3.5, y_start=400, y_stop=596)
-        if len(win7) != 0:
-            windows.append(win7)
-
-        win8 = d.detect(frame, scale=3.5, y_start=464, y_stop=660)
-        if len(win8) != 0:
-            windows.append(win8)
 
         if len(windows) != 0:
             win_list = np.concatenate(windows)
@@ -135,8 +108,10 @@ def pipeline():
             frame_out = cv2.cvtColor(frame_label, cv2.COLOR_RGB2BGR)
         else:
             frame_out = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        #cv2.imshow("Heat", frame_win)
         cv2.imshow("Output", frame_out)
+        filename = "output/img" + str(i) + ".png"
+        i += 1
+        cv2.imwrite(filename, frame_out)
         cv2.waitKey(1)
 
 
